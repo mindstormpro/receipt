@@ -1,13 +1,27 @@
 // RECEIPT!
 // This is the file to edit. p5.js reference: https://p5js.org/reference/
 import JsBarcode from "jsbarcode";
+import kai from "./kai.png";
+import heart from "./heart.png"
 
 export const receipt = {
-  height: 1080, // 240–2000 px. Width is fixed by the printer.
+  height: 800, // 240–2000 px. Width is fixed by the printer.
   seed: 67,
 };
 
-// everything here is editable. play around or rm -rf and see what you come up with!
+// happee birthday (heart pic too)
+// --------------
+// |----------|
+// |          |
+// |The Image |
+// |          |
+// |----------|
+// -------------
+// barcode here 
+//
+//
+//
+
 export function drawReceipt(p) {
   const { width: w, height: h } = p;
   const margin = 24;
@@ -16,77 +30,51 @@ export function drawReceipt(p) {
   p.noStroke();
   p.fill(0);
     p.textFont("monospace");
-    p.textAlign(p.CENTER, p.TOP);
+    p.textAlign(p.LEFT, p.TOP);
     p.textStyle(p.BOLD);
     p.textSize(28);
-    p.text("NIGHT SIGNALS", w / 2, 30);
+    p.text("Happy birthday Kai!", margin , 30);
+  p.loadImage(heart, (img) => {
+    const imgWidth = 40;
+    const imgHeight = 39;
+    p.image(img, margin * 13.5, margin, imgWidth, imgHeight);
+    p.filter(p.THRESHOLD, 0.5);
+  });
 
   dashedLine(p, margin, 94, w - margin, 94, 6, 5);
 
-  // A seeded field of tiny stars and radio noise.
-  for (let i = 0; i < 150; i += 1) {
-    const x = p.random(margin, w - margin);
-    const y = p.random(118, 350);
-    const size = p.random([1, 1, 1, 2, 2, 3]);
-    if (p.random() > 0.82) {
-      p.rect(x - 3, y, 7, 1);
-      p.rect(x, y - 3, 1, 7);
-    } else {
-      p.rect(x, y, size, size);
-    }
-  }
 
-  // Layered mountain signals. p.noise() and p.random() are both seeded.
-  const ridgeTop = 300;
-  for (let layer = 0; layer < 5; layer += 1) {
-    p.fill(layer % 2 === 0 ? 0 : 255);
-    p.stroke(0);
-    p.strokeWeight(2);
-    p.beginShape();
-    p.vertex(margin, 500 + layer * 48);
-    for (let x = margin; x <= w - margin; x += 5) {
-      const wave = p.noise(x * 0.012, layer * 4.2) * 90;
-      const y = ridgeTop + layer * 50 - wave;
-      p.vertex(x, y);
-    }
-    p.vertex(w - margin, 500 + layer * 48);
-    p.endShape(p.CLOSE);
-  }
-
-  // The transmission: a winding route with little station markers.
-  p.noFill();
-  p.stroke(0);
-  p.strokeWeight(5);
-  p.beginShape();
-  const route = [];
-  for (let y = 585; y < 915; y += 34) {
-    const x = p.map(p.noise(y * 0.018, 20), 0, 1, 68, w - 68);
-    route.push({ x, y });
-    p.vertex(x, y);
-  }
-  p.endShape();
-
-  p.strokeWeight(2);
-  p.fill(255);
-  route.forEach(({ x, y }, index) => {
-    if (index % 2 === 0) {
-      p.square(x - 6, y - 6, 12);
-      p.line(index % 4 === 0 ? margin : w - margin, y, x, y);
-    }
+  p.loadImage(kai, (img) => {
+    const imgWidth = w - (margin * 2);
+    const imgHeight = (img.height / img.width) * imgWidth;
+    p.image(img, margin, 100, imgWidth, imgHeight);
+    p.filter(p.THRESHOLD, 0.5);
   });
 
-  dashedLine(p, margin, 930, w - margin, 930, 6, 5);
+  dashedLine(p, margin, margin * 2 + 520, w - margin, margin * 2 + 520, 6, 5);
+  
 
-  const barcodeValue = "receipt.hackclub.com";
-  drawBarcode(p, barcodeValue, w / 2, 960);
+  dashedLine(p, margin, margin * 2 + 600, w - margin, margin * 2 + 600, 10, 0)
+  // the barcode stuffs
+  const barcodeY = margin * 3 + 521;
+  const barcodeValue = "designed by Elio with love <3";
+  drawBarcode(p, barcodeValue, w / 2, barcodeY + 80);
 
   p.noStroke();
   p.fill(0);
   p.textFont("monospace");
   p.textAlign(p.CENTER, p.TOP);
   p.textStyle(p.NORMAL);
-  p.textSize(10);
-  p.text(barcodeValue, w / 2, 1024);
+  p.textSize(15);
+  p.text(barcodeValue, w / 2, 1024 - 960 + barcodeY + 80);
+
+  p.noStroke();
+  p.fill(0);
+  p.textFont("monospace");
+  p.textAlign(p.CENTER, p.TOP);
+  p.textStyle(p.NORMAL);
+  p.textSize(15);
+  p.text("Printed by hackclub for the Printed YSWS!", w / 2, 1024 - 960 + barcodeY + margin + 80);
 }
 
 function drawBarcode(p, value, centerX, y) {
